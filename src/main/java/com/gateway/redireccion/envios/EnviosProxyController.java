@@ -1,4 +1,4 @@
-package com.gateway.redireccion.inventario;
+package com.gateway.redireccion.envios;
 
 import org.springframework.http.HttpHeaders;
 
@@ -21,23 +21,23 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/proxy/inventario")
+@RequestMapping("/api/proxy/envios")
 @RequiredArgsConstructor
-public class InventarioProxyController {
+public class EnviosProxyController {
 
     private final RestTemplate restTemplate;
     private final JwtService jwtService;
 
     @RequestMapping(value = "/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-    public ResponseEntity<?> proxyInventario(HttpServletRequest request,
-                                            @RequestBody(required = false) String body,
-                                            @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<?> proxyEnvios(HttpServletRequest request,
+                                         @RequestBody(required = false) String body,
+                                         @RequestHeader HttpHeaders headers) {
 
-        String originalPath = request.getRequestURI().replace("/api/proxy/inventario", "");
-        String targetUrl = "http://localhost:8088/api/inventario" + originalPath;
+        String originalPath = request.getRequestURI().replace("/api/proxy/envios", "");
+        String targetUrl = "http://localhost:8091/api/envios" + originalPath;
         HttpMethod method = HttpMethod.valueOf(request.getMethod());
 
-        
+   
         if (method == HttpMethod.DELETE) {
             String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -52,11 +52,11 @@ public class InventarioProxyController {
             if (!"admin".equalsIgnoreCase(rol)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body("{\"error\": \"Solo admin puede eliminar inventario\"}");
+                        .body("{\"error\": \"Solo admin puede eliminar envios\"}");
             }
         }
 
-       
+
         if (method == HttpMethod.PUT) {
             String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -71,11 +71,11 @@ public class InventarioProxyController {
             if (!"admin".equalsIgnoreCase(rol)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body("{\"error\": \"Solo admin puede actualizar inventario\"}");
+                        .body("{\"error\": \"Solo admin puede actualizar envios\"}");
             }
         }
 
-       
+
         HttpHeaders cleanHeaders = new HttpHeaders();
         headers.forEach((key, value) -> {
             if (!key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH)) {
@@ -86,7 +86,7 @@ public class InventarioProxyController {
 
         HttpEntity<String> entity = new HttpEntity<>(body, cleanHeaders);
 
-       
+
         try {
             ResponseEntity<String> response = restTemplate.exchange(targetUrl, method, entity, String.class);
             return ResponseEntity.status(response.getStatusCode())
