@@ -36,7 +36,8 @@ public class VentasProxyController {
         String targetUrl = "http://localhost:8090/api/ventas" + originalPath;
         HttpMethod method = HttpMethod.valueOf(request.getMethod());
 
-        // Validar DELETE solo si no es admin
+        
+        
         if (method == HttpMethod.DELETE) {
             String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -55,7 +56,8 @@ public class VentasProxyController {
             }
         }
 
-        // Validar PUT solo si no es admin
+        
+        
         if (method == HttpMethod.PUT) {
             String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -74,7 +76,7 @@ public class VentasProxyController {
             }
         }
 
-        // Clonar headers válidos
+        
         HttpHeaders cleanHeaders = new HttpHeaders();
         headers.forEach((key, value) -> {
             if (!key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH)) {
